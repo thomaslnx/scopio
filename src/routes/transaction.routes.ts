@@ -1,9 +1,9 @@
-import { Router, Response } from 'express'
+import { Router, Request, Response } from 'express';
 
-const transactionRouter = Router()
+const transactionRouter = Router();
 
-transactionRouter.get('/', (_, res: Response) => {
-  res.send('Ok tudo fucionando!!')
-})
+transactionRouter.get('/', (_req: Request, res: Response) => {
+  res.send('Ok tudo fucionando!!');
+});
 
-export default transactionRouter
+export default transactionRouter;
