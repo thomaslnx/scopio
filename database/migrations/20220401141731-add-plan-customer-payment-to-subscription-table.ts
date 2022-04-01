@@ -1,14 +1,14 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('Subscriptions', 'costumer', {
+    await queryInterface.addColumn('Subscriptions', 'customer', {
       type: Sequelize.UUID,
      }).then(() => {
        queryInterface.addConstraint('Subscriptions', {
-         fields: ['costumer'],
+         fields: ['customer'],
          type: 'foreign key',
-         name: 'subscription_costumer_association',
+         name: 'subscription_customer_association',
          references: {
-           table: 'Costumers',
+           table: 'Customers',
            field: 'id',
          },
          onDelete: 'CASCADE',
@@ -48,8 +48,8 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('Subscriptions', 'subscription_costumer_association').then(() => {
-      queryInterface.removeColumn('Subscriptions', 'costumer', {
+    await queryInterface.removeConstraint('Subscriptions', 'subscription_customer_association').then(() => {
+      queryInterface.removeColumn('Subscriptions', 'customer', {
         type: Sequelize.UUID,
       })
     });

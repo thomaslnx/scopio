@@ -1,9 +1,9 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('Costumers', 'subscriptionId', {
+    await queryInterface.addColumn('Customers', 'subscriptionId', {
        type: Sequelize.UUID,
       }).then(() => {
-        queryInterface.addConstraint('Costumers', {
+        queryInterface.addConstraint('Customers', {
           fields: ['subscriptionId'],
           type: 'foreign key',
           name: 'costumer_subscription_association',
@@ -18,8 +18,8 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('Costumers', 'costumer_subscription_association').then(() => {
-       queryInterface.removeColumn('Costumers', 'subscriptionId', {
+    await queryInterface.removeConstraint('Customers', 'costumer_subscription_association').then(() => {
+       queryInterface.removeColumn('Customers', 'subscriptionId', {
          type: Sequelize.UUID,
        })
      });

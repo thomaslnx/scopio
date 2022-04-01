@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '.';
+import Subscription from './subscription';
 
 interface PaymentGatewayAttributes {
   id: string;
@@ -45,5 +46,11 @@ PaymentGateway.init(
     sequelize,
   }
 );
+
+PaymentGateway.hasMany(Subscription, {
+  sourceKey: 'subscriptionId',
+  foreignKey: 'id',
+  as: 'payment_gateways_subscriptions'
+})
 
 export default PaymentGateway;

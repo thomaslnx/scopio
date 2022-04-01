@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '.';
+import Subscription from './subscription';
 
 interface PlanAttributes {
   id: string;
@@ -59,5 +60,11 @@ Plan.init(
     sequelize,
   }
 );
+
+Plan.hasMany(Subscription, {
+  sourceKey: 'subscriptionId',
+  foreignKey: 'id',
+  as: 'plans_subscriptions'
+})
 
 export default Plan;

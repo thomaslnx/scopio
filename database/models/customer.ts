@@ -1,7 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '.';
+import Subscription from './subscription'
 
-interface CostumerAttributes {
+interface CustomerAttributes {
   id: string;
   first_name: string;
   last_name: string;
@@ -12,7 +13,7 @@ interface CostumerAttributes {
   deleted_at: Date;
 }
 
-class Costumer extends Model<CostumerAttributes> {
+class Customer extends Model<CustomerAttributes> {
   declare id: string;
 
   declare first_name: string;
@@ -30,7 +31,7 @@ class Costumer extends Model<CostumerAttributes> {
   declare deleted_at: Date;
 }
 
-Costumer.init(
+Customer.init(
   {
     id: {
       allowNull: false,
@@ -75,4 +76,10 @@ Costumer.init(
   }
 );
 
-export default Costumer;
+Customer.hasMany(Subscription, {
+  sourceKey: 'subscriptionId',
+  foreignKey: 'id',
+  as: 'customers_subscriptions'
+});
+
+export default Customer;

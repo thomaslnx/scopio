@@ -1,5 +1,8 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '.';
+import Customer from './customer';
+import PaymentGateway from './paymentgateway';
+import Plan from './plan';
 
 interface SubscriptionAttributes {
   id: string;
@@ -52,5 +55,15 @@ Subscription.init(
     sequelize,
   }
 );
+
+Subscription.belongsTo(Customer, {
+  targetKey: 'id',
+})
+Subscription.belongsTo(Plan, {
+  targetKey: 'id',
+})
+Subscription.belongsTo(PaymentGateway, {
+  targetKey: 'id',
+})
 
 export default Subscription;
