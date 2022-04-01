@@ -24,15 +24,6 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
-      // subscriptionId: {
-      //   type: Sequelize.STRING,
-      //   references: {
-      //     model: {
-      //       tableName: 'Subscriptions',
-      //     },
-      //     key: 'id',
-      //   },
-      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
