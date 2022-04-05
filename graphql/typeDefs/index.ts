@@ -78,6 +78,25 @@ export const typeDefs = gql`
     id: ID!
   }
 
+  input SubscriptionInput {
+    customerId: ID!
+    planId: ID!
+    paymentGatewayId: ID!
+    endsAt: String!
+  }
+
+  input SubscriptionInputUpdate {
+    id: ID!
+    customerId: ID!
+    planId: ID!
+    paymentGatewayId: ID!
+    endsAt: String
+  }
+
+  input DeleteSubscriptionInput {
+    id: ID!
+  }
+
   type Query {
     plans: [Plan]
     customers: [Customer]
@@ -97,5 +116,9 @@ export const typeDefs = gql`
     createPaymentGateway(input: PaymentGatewayInput!): PaymentGateway
     updatePaymentGateway(input: PaymentGatewayInputUpdate!): PaymentGateway
     deletePaymentGateway(input: DeletePaymentGatewayInput): Boolean
+
+    createSubscription(input: SubscriptionInput!): Subscription
+    updateSubscription(input: SubscriptionInputUpdate!): Subscription
+    deleteSubscription(input: DeleteSubscriptionInput): Boolean
   }
 `;

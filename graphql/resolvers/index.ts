@@ -1,4 +1,5 @@
-import { Op } from 'sequelize'
+import { Op } from 'sequelize';
+import moment from 'moment';
 
 import Plan from '../../database/models/plan';
 import Customer from '../../database/models/customer';
@@ -60,6 +61,16 @@ interface UpdatePaymentGatewayInput {
 interface DeletePaymentGatewayInput {
   input: {
     id: string;
+  }
+}
+
+interface CreateSubscriptionInput {
+  input: {
+    customerId: string;
+    planId: string;
+    paymentGatewayId: string;
+    endsAt: string;
+    deletedAt?: Date;
   }
 }
 
@@ -245,5 +256,51 @@ export const resolvers = {
         }
       })
     },
+
+    async createSubscription(_: any, { input }: CreateSubscriptionInput) {
+      const { customerId, paymentGatewayId, planId, endsAt } = input;
+
+      const customerExist = await Customer.findByPk(customerId);
+      const planExist = await Plan.findByPk(planId);
+      const paymentGatewayExist = await PaymentGateway.findByPk(paymentGatewayId);
+
+      const formattedDate = new Date(moment(endsAt).toISOString());
+
+      if(!planExist) {
+        throw new Error('This plan does not exist!');
+      }
+
+      if(!customerExist) {
+        throw new Error('This customer does not exist!');
+      }
+
+      if(!paymentGatewayExist) {
+        throw new Error('This payment gateway does not exist!');
+      }
+
+      const newSubscription = await Subscription.create({
+        customerId: customerId,
+        planId: planId,
+        paymentGatewayId: paymentGatewayId,
+        endsAt: formattedDate,
+      })
+
+
+      return newSubscription;
+      // const newSubscriptionId = newSubscription.id;
+
+      // const searchSubscription = await Subscription.findAll({
+      //   where: {
+      //     id: newSubscriptionId
+      //   },
+      //   include: {
+      //     model: PaymentGateway,
+      //     as: 'payment_gateway',
+      //   },
+      // })
+
+      // console.log('valor de newSubscription: ', newSubscription);
+      // console.log('valor de searchSubscription: ', searchSubscription);
+    }
   }
 };

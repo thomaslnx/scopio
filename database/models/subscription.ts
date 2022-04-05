@@ -23,7 +23,9 @@ interface SubscriptionAttributes {
   paymentGatewayId: string;
 }
 
-class Subscription extends Model<SubscriptionAttributes> {
+type SubscriptionInputAttribues = Omit<SubscriptionAttributes, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+
+class Subscription extends Model<SubscriptionAttributes | SubscriptionInputAttribues> {
   declare id: string;
 
   declare endsAt: Date;
@@ -62,14 +64,14 @@ Subscription.init(
       type: DataTypes.DATE,
     },
     deletedAt: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.DATE,
     },
     customerId: {
       type: DataTypes.UUID,
       references: {
         model: Customer,
-        key: 'Id'
+        key: 'Id',
       },
     },
     planId: {
