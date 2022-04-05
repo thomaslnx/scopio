@@ -1,7 +1,7 @@
-import Plan from '../../../database/models/plan';
-import Customer from '../../../database/models/customer';
-import Subscription from '../../../database/models/subscription';
-import PaymentGateway from '../../../database/models/paymentgateway';
+import Plan from '../../database/models/plan';
+import Customer from '../../database/models/customer';
+import Subscription from '../../database/models/subscription';
+import PaymentGateway from '../../database/models/paymentgateway';
 
 interface PlanInputAttributes {
   input: {

@@ -2,8 +2,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
 import app from '../app';
-import { typeDefs } from '../utils/typeDefs';
-import { resolvers } from '../utils/resolvers';
+import { typeDefs } from '../../graphql/typeDefs';
+import { resolvers } from '../../graphql/resolvers';
 
 export const port = process.env.PORT || 3000;
 
