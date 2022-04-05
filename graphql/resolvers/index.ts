@@ -11,6 +11,15 @@ interface PlanInputAttributes {
   }
 }
 
+interface PlanInputUpdate {
+  input: {
+    id: string;
+    name?: string;
+    billingCycle?: number;
+    price?: number;
+  }
+}
+
 export const resolvers = {
   Query: {
     async plans() {
@@ -39,7 +48,6 @@ export const resolvers = {
 
       const {billingCycle, name, price} = input
 
-      console.log('valor de input: ', billingCycle, name, price)
       const planExist = await Plan.findOne({
         where: {
           name: name
@@ -55,6 +63,25 @@ export const resolvers = {
           billingCycle: billingCycle,
           price: price,
         })
-    }
+    },
+
+    async updatePlan(_: any, {input}: PlanInputUpdate) {
+
+      const { id, name, billingCycle, price } = input;
+
+      const planExist = await Plan.findByPk(id);
+
+      if(!planExist) {
+        throw new Error('this plan does not exist!')
+      }
+
+      return planExist.update({
+        name,
+        billingCycle,
+        price
+      })
+    },
+
+    // async deletePan() {},
   }
 };

@@ -14,6 +14,13 @@ export const typeDefs = gql`
     price: Float!
   }
 
+  input PlanUpdateInput {
+    id: ID!
+    name: String
+    billingCycle: Int
+    price: Float
+  }
+
   type Customer {
     id: ID!
     firstName: String!
@@ -44,5 +51,6 @@ export const typeDefs = gql`
 
   type Mutation {
     createPlan(input: PlanInput!): Plan
+    updatePlan(input: PlanUpdateInput!): Plan
   }
 `;
