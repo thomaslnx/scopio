@@ -1,45 +1,46 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('Subscriptions', 'customer', {
+    await queryInterface.addColumn('subscriptions', 'customerId', {
       type: Sequelize.UUID,
      }).then(() => {
-       queryInterface.addConstraint('Subscriptions', {
-         fields: ['customer'],
+       queryInterface.addConstraint('subscriptions', {
+         fields: ['customerId'],
          type: 'foreign key',
          name: 'subscription_customer_association',
          references: {
-           table: 'Customers',
+           table: 'customers',
            field: 'id',
          },
          onDelete: 'CASCADE',
          onUpdate: 'CASCADE',
        })
      });
-     await queryInterface.addColumn('Subscriptions', 'plan', {
+     await queryInterface.addColumn('subscriptions', 'planId', {
       type: Sequelize.UUID,
      }).then(() => {
-       queryInterface.addConstraint('Subscriptions', {
-         fields: ['plan'],
+       queryInterface.addConstraint('subscriptions', {
+         fields: ['planId'],
          type: 'foreign key',
          name: 'subscription_plan_association',
          references: {
-           table: 'Plans',
+           table: 'plans',
            field: 'id',
          },
          onDelete: 'CASCADE',
          onUpdate: 'CASCADE',
        })
      });
-     await queryInterface.addColumn('Subscriptions', 'paymentGateway', {
+     await queryInterface.addColumn('subscriptions', 'paymentGatewayId', {
       type: Sequelize.UUID,
      }).then(() => {
-       queryInterface.addConstraint('Subscriptions', {
-         fields: ['paymentGateway'],
+       queryInterface.addConstraint('subscriptions', {
+         fields: ['paymentGatewayId'],
          type: 'foreign key',
          name: 'subscription_payment_gateway_association',
          references: {
-           table: 'PaymentGateways',
+           table: 'payment_gateways',
            field: 'id',
+
          },
          onDelete: 'CASCADE',
          onUpdate: 'CASCADE',
@@ -48,18 +49,18 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('Subscriptions', 'subscription_customer_association').then(() => {
-      queryInterface.removeColumn('Subscriptions', 'customer', {
+    await queryInterface.removeConstraint('subscriptions', 'subscription_customer_association').then(() => {
+      queryInterface.removeColumn('subscriptions', 'customerId', {
         type: Sequelize.UUID,
       })
     });
-    await queryInterface.removeConstraint('Subscriptions', 'subscription_plan_association').then(() => {
-      queryInterface.removeColumn('Subscriptions', 'plan', {
+    await queryInterface.removeConstraint('subscriptions', 'subscription_plan_association').then(() => {
+      queryInterface.removeColumn('subscriptions', 'planId', {
         type: Sequelize.UUID,
       })
     });
-    await queryInterface.removeConstraint('Subscriptions', 'subscription_payment_gateway_association').then(() => {
-      queryInterface.removeColumn('Subscriptions', 'paymentGateway', {
+    await queryInterface.removeConstraint('subscriptions', 'subscription_payment_gateway_association').then(() => {
+      queryInterface.removeColumn('subscriptions', 'paymentGatewayId', {
         type: Sequelize.UUID,
       })
     });

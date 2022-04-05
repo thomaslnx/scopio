@@ -1,11 +1,13 @@
-import { Sequelize, Dialect } from 'sequelize';
-import config from '../../config/database';
+import Customer from './customer'
+import Plan from './plan'
+import Subscription from './subscription'
+import PaymentGateway from './paymentgateway'
 
-const { database, dialect, host, password, username } = config;
+const models = {
+  Customer,
+  Plan,
+  Subscription,
+  PaymentGateway
+}
 
-const sequelize = new Sequelize(database, username, password, {
-  host,
-  dialect: dialect as Dialect,
-});
-
-export { sequelize, Sequelize };
+export default models;

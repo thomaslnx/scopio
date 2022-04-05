@@ -2,6 +2,9 @@ import express, { Express } from 'express';
 import cors from 'cors';
 
 import routes from './routes';
+import dbInit from '../src/utils/dbInit';
+
+dbInit();
 
 const app: Express = express();
 

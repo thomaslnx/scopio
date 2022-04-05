@@ -1,27 +1,44 @@
-import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '.';
+import { Sequelize, Dialect,DataTypes, Model } from 'sequelize';
+
 import Customer from './customer';
 import PaymentGateway from './paymentgateway';
 import Plan from './plan';
 
+import config from '../../config/database';
+
+const { database, dialect, host, password, username } = config;
+
+const sequelize = new Sequelize(database, username, password, {
+  host,
+  dialect: dialect as Dialect,
+});
 interface SubscriptionAttributes {
   id: string;
-  created_at: Date;
-  updated_at: Date;
-  ends_at: Date;
-  deleted_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  endsAt: Date;
+  deletedAt: Date;
+  customerId: string;
+  planId: string;
+  paymentGatewayId: string;
 }
 
 class Subscription extends Model<SubscriptionAttributes> {
   declare id: string;
 
-  declare ends_at: Date;
+  declare endsAt: Date;
 
-  declare created_at: Date;
+  declare createdAt: Date;
 
-  declare updated_at: Date;
+  declare updatedAt: Date;
 
-  declare deleted_at: Date;
+  declare deletedAt: Date;
+
+  declare customerId: string;
+
+  declare planId: string;
+
+  declare paymentGateway: string;
 }
 
 Subscription.init(
@@ -32,38 +49,68 @@ Subscription.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    ends_at: {
+    endsAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
-    created_at: {
+    createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
-    updated_at: {
+    updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
-    deleted_at: {
+    deletedAt: {
       allowNull: false,
       type: DataTypes.DATE,
+    },
+    customerId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Customer,
+        key: 'Id'
+      },
+    },
+    planId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Plan,
+        key: 'Id'
+      },
+    },
+    paymentGatewayId: {
+      type: DataTypes.UUID,
+      references: {
+        model: PaymentGateway,
+        key: 'Id',
+      },
     },
   },
   {
     timestamps: true,
-    tableName: 'Subscriptions',
+    tableName: 'subscriptions',
     sequelize,
   }
 );
 
+Customer.hasMany(Subscription, { foreignKey: 'customerId' })
+Plan.hasMany(Subscription, { foreignKey: 'planId' })
+PaymentGateway.hasMany(Subscription, { foreignKey: 'paymentGatewayId' })
+
 Subscription.belongsTo(Customer, {
   targetKey: 'id',
+  foreignKey: 'customerId',
+  as: 'customer',
 })
 Subscription.belongsTo(Plan, {
   targetKey: 'id',
+  foreignKey: 'planId',
+  as: 'plans',
 })
 Subscription.belongsTo(PaymentGateway, {
   targetKey: 'id',
+  as: 'payment_gateway',
 })
 
 export default Subscription;

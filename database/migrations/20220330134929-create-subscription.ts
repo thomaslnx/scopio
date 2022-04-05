@@ -1,39 +1,12 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Subscriptions', {
+    await queryInterface.createTable('subscriptions', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         default: Sequelize.UUIDV4,
       },
-      // costumer: {
-      //   type: Sequelize.STRING,
-      //   references: {
-      //     model: {
-      //       tableName: 'Costumer',
-      //     },
-      //     key: 'id',
-      //   },
-      // },
-      // plan: {
-      //   type: Sequelize.STRING,
-      //   references: {
-      //     model: {
-      //       tableName: 'Plan',
-      //     },
-      //     key: 'id',
-      //   },
-      // },
-      // paymentGateway: {
-      //   type: Sequelize.STRING,
-      //   references: {
-      //     model: {
-      //       tableName: 'PaymentGateway',
-      //     },
-      //     key: 'id',
-      //   },
-      // },
       endsAt: {
         type: Sequelize.DATE,
       },
@@ -51,6 +24,6 @@ module.exports = {
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Subscriptions');
+    await queryInterface.dropTable('subscriptions');
   },
 };

@@ -1,7 +1,7 @@
+import  { Sequelize, Dialect } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '.';
-import Subscription from './subscription';
 
+import config from '../../config/database';
 interface PlanAttributes {
   id: string;
   name: string;
@@ -11,7 +11,16 @@ interface PlanAttributes {
   updatedAt: Date;
 }
 
-class Plan extends Model<PlanAttributes> {
+const { database, dialect, host, password, username } = config;
+
+const sequelize = new Sequelize(database, username, password, {
+  host,
+  dialect: dialect as Dialect,
+});
+
+type CreatePlanAttributes = Omit<PlanAttributes, 'id' | 'createdAt' | 'updatedAt'>
+
+class Plan extends Model<PlanAttributes | CreatePlanAttributes> {
   declare id: string;
 
   declare name: string;
@@ -57,14 +66,9 @@ Plan.init(
   {
     timestamps: true,
     tableName: 'plans',
+    underscored: false,
     sequelize,
   }
 );
-
-Plan.hasMany(Subscription, {
-  sourceKey: 'subscriptionId',
-  foreignKey: 'id',
-  as: 'plans_subscriptions'
-})
 
 export default Plan;

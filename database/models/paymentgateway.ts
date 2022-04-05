@@ -1,12 +1,18 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '.';
-import Subscription from './subscription';
+import { Sequelize, Dialect, Model, DataTypes } from 'sequelize'
 
+import config from '../../config/database';
+
+const { database, dialect, host, password, username } = config;
+
+const sequelize = new Sequelize(database, username, password, {
+  host,
+  dialect: dialect as Dialect,
+});
 interface PaymentGatewayAttributes {
   id: string;
   name: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 class PaymentGateway extends Model<PaymentGatewayAttributes> {
@@ -14,9 +20,9 @@ class PaymentGateway extends Model<PaymentGatewayAttributes> {
 
   declare name: string;
 
-  declare created_at: Date;
+  declare createdAt: Date;
 
-  declare updated_at: Date;
+  declare updatedAt: Date;
 }
 
 PaymentGateway.init(
@@ -31,26 +37,20 @@ PaymentGateway.init(
       allowNull: false,
       type: DataTypes.STRING,
     },
-    created_at: {
+    createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
-    updated_at: {
+    updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
   },
   {
     timestamps: true,
-    tableName: 'PaymentGateways',
+    tableName: 'payment_gateways',
     sequelize,
   }
 );
-
-PaymentGateway.hasMany(Subscription, {
-  sourceKey: 'subscriptionId',
-  foreignKey: 'id',
-  as: 'payment_gateways_subscriptions'
-})
 
 export default PaymentGateway;

@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('PaymentGateways', {
+    await queryInterface.createTable('payment_gateways', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -19,18 +19,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      // subscriptionId: {
-      //   type: Sequelize.STRING,
-      //   references: {
-      //     model: {
-      //       tableName: 'Subscriptions',
-      //     },
-      //     key: 'id',
-      //   },
-      // },
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('PaymentGateways');
+    await queryInterface.dropTable('payment_gateways');
   },
 };

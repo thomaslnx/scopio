@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "server": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/server/index.ts",
+    "server": "nodemon --watch './**/*.ts' --exec 'node --trace-warnings --experimental-specifier-resolution=node --loader ts-node/esm' src/server/index.ts",
     "prepare": "husky install"
   },
   "engines": {
@@ -44,6 +44,7 @@
     "graphql": "^16.3.0",
     "pg": "^8.7.3",
     "sequelize": "^6.17.0",
-    "type-graphql": "^1.1.1"
+    "type-graphql": "^1.1.1",
+    "uuidv4": "^6.2.13"
   }
 }
