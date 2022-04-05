@@ -48,6 +48,10 @@ export const typeDefs = gql`
     email: String
   }
 
+  input DeleteCustomerInput {
+    id: ID!
+  }
+
   type Subscription {
     id: ID!
     customerId: [Customer!]
@@ -75,5 +79,6 @@ export const typeDefs = gql`
 
     createCustomer(input: CustomerInput!): Customer
     updateCustomer(input: CustomerInputUpdate!): Customer
+    deleteCustomer(input: DeleteCustomerInput): Boolean
   }
 `;

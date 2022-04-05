@@ -4,7 +4,6 @@ import Plan from '../../database/models/plan';
 import Customer from '../../database/models/customer';
 import Subscription from '../../database/models/subscription';
 import PaymentGateway from '../../database/models/paymentgateway';
-
 interface PlanInputAttributes {
   input: {
     name: string;
@@ -12,7 +11,6 @@ interface PlanInputAttributes {
     price: number
   }
 }
-
 interface PlanInputUpdate {
   input: {
     id: string;
@@ -21,13 +19,11 @@ interface PlanInputUpdate {
     price?: number;
   }
 }
-
 interface DeletePlanInput {
   input: {
     id: string;
   }
 }
-
 interface CreatCustomerInput {
   input: {
     firstName: string;
@@ -36,7 +32,6 @@ interface CreatCustomerInput {
     email: string
   }
 }
-
 interface UpdateCustomerInput {
   input: {
     id: string;
@@ -44,6 +39,11 @@ interface UpdateCustomerInput {
     lastName?: string;
     role?: string;
     email?: string
+  }
+}
+interface DeleteCustomerInput {
+  input: {
+    id: string;
   }
 }
 
@@ -163,6 +163,22 @@ export const resolvers = {
         lastName: lastName,
         role: role,
         email: email,
+      })
+    },
+
+    async deleteCustomer(_: any, { input }: DeleteCustomerInput) {
+      const { id } = input;
+
+      const customerExist = await Customer.findByPk(id);
+
+      if(!customerExist) {
+        throw new Error('this customer does not exist!');
+      }
+
+      return Customer.destroy({
+        where: {
+          id: id
+        }
       })
     }
   }
