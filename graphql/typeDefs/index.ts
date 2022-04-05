@@ -21,6 +21,10 @@ export const typeDefs = gql`
     price: Float
   }
 
+  input DeletePlanInput {
+    id: ID!
+  }
+
   type Customer {
     id: ID!
     firstName: String!
@@ -52,5 +56,6 @@ export const typeDefs = gql`
   type Mutation {
     createPlan(input: PlanInput!): Plan
     updatePlan(input: PlanUpdateInput!): Plan
+    deletePlan(input: DeletePlanInput): Boolean
   }
 `;

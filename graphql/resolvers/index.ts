@@ -20,6 +20,12 @@ interface PlanInputUpdate {
   }
 }
 
+interface DeletePlanInput {
+  input: {
+    id: string;
+  }
+}
+
 export const resolvers = {
   Query: {
     async plans() {
@@ -65,7 +71,7 @@ export const resolvers = {
         })
     },
 
-    async updatePlan(_: any, {input}: PlanInputUpdate) {
+    async updatePlan(_: any, { input }: PlanInputUpdate) {
 
       const { id, name, billingCycle, price } = input;
 
@@ -82,6 +88,20 @@ export const resolvers = {
       })
     },
 
-    // async deletePan() {},
+    async deletePlan(_: any, { input }: DeletePlanInput) {
+      const { id } = input;
+
+      const planExist = await Plan.findByPk(id);
+
+      if(!planExist) {
+        throw new Error('this plan does not exist!');
+      }
+
+      return Plan.destroy({
+        where: {
+          id: id
+        }
+      })
+    },
   }
 };
