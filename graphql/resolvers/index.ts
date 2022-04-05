@@ -57,6 +57,11 @@ interface UpdatePaymentGatewayInput {
     name: string;
   }
 }
+interface DeletePaymentGatewayInput {
+  input: {
+    id: string;
+  }
+}
 
 export const resolvers = {
   Query: {
@@ -225,6 +230,20 @@ export const resolvers = {
       });
     },
 
-    async deletePaymentGateway() {},
+    async deletePaymentGateway(_: any, { input }: DeletePaymentGatewayInput) {
+      const { id } = input;
+
+      const paymentGatewayExist = await PaymentGateway.findByPk(id);
+
+      if(!paymentGatewayExist) {
+        throw new Error('this payment gateway does not exist!');
+      }
+
+      return PaymentGateway.destroy({
+        where: {
+          id: id
+        }
+      })
+    },
   }
 };
