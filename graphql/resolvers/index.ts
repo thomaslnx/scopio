@@ -1,3 +1,5 @@
+import { Op } from 'sequelize'
+
 import Plan from '../../database/models/plan';
 import Customer from '../../database/models/customer';
 import Subscription from '../../database/models/subscription';
@@ -23,6 +25,15 @@ interface PlanInputUpdate {
 interface DeletePlanInput {
   input: {
     id: string;
+  }
+}
+
+interface CreatCustomerInput {
+  input: {
+    firstName: string;
+    lastName: string;
+    role: string;
+    email: string
   }
 }
 
@@ -103,5 +114,28 @@ export const resolvers = {
         }
       })
     },
+
+    async createCustomer(_: any, { input }: CreatCustomerInput) {
+      const { firstName, lastName, role, email } = input;
+
+      const customerExist = await Customer.findOne({
+        where: {
+          [Op.and]: [
+            { firstName: firstName},
+            { lastName: lastName},
+          ]
+        }
+      });
+
+      if (customerExist) {
+        throw new Error('This customer already exist on database!');
+      }
+      return Customer.create({
+        firstName: firstName,
+        lastName: lastName,
+        role: role,
+        email: email,
+      })
+    }
   }
 };

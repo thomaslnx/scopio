@@ -20,7 +20,9 @@ interface CustomerAttributes {
   deletedAt: Date;
 }
 
-class Customer extends Model<CustomerAttributes> {
+type CreateCustomerAttributes = Omit<CustomerAttributes, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' >
+
+class Customer extends Model<CustomerAttributes | CreateCustomerAttributes> {
   declare ed: string;
 
   declare firstName: string;
