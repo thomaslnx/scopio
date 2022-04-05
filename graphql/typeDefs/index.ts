@@ -39,6 +39,15 @@ export const typeDefs = gql`
     role: String!
     email: String!
   }
+
+  input CustomerInputUpdate {
+    id: ID!
+    firstName: String
+    lastName: String
+    role: String
+    email: String
+  }
+
   type Subscription {
     id: ID!
     customerId: [Customer!]
@@ -65,5 +74,6 @@ export const typeDefs = gql`
     deletePlan(input: DeletePlanInput): Boolean
 
     createCustomer(input: CustomerInput!): Customer
+    updateCustomer(input: CustomerInputUpdate!): Customer
   }
 `;

@@ -37,6 +37,16 @@ interface CreatCustomerInput {
   }
 }
 
+interface UpdateCustomerInput {
+  input: {
+    id: string;
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    email?: string
+  }
+}
+
 export const resolvers = {
   Query: {
     async plans() {
@@ -130,7 +140,25 @@ export const resolvers = {
       if (customerExist) {
         throw new Error('This customer already exist on database!');
       }
+
       return Customer.create({
+        firstName: firstName,
+        lastName: lastName,
+        role: role,
+        email: email,
+      })
+    },
+
+    async updateCustomer(_: any, { input }: UpdateCustomerInput) {
+      const { id, firstName, lastName, role, email } = input;
+
+      const customerExist = await Customer.findByPk(id);
+
+      if (!customerExist) {
+        throw new Error('This customer does not exist!');
+      }
+
+      return customerExist.update({
         firstName: firstName,
         lastName: lastName,
         role: role,
