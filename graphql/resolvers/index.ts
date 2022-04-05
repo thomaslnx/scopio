@@ -51,6 +51,12 @@ interface CreatePaymentGatewayInput {
     name: string;
   }
 }
+interface UpdatePaymentGatewayInput {
+  input: {
+    id: string;
+    name: string;
+  }
+}
 
 export const resolvers = {
   Query: {
@@ -205,7 +211,19 @@ export const resolvers = {
       })
     },
 
-    async updatePaymentGateway() {},
+    async updatePaymentGateway(_:any, { input }: UpdatePaymentGatewayInput) {
+      const { id, name } = input;
+
+      const paymentGatewayExist = await PaymentGateway.findByPk(id);
+
+      if(!paymentGatewayExist) {
+        throw new Error('this payment gateway does not exist!')
+      }
+
+      return paymentGatewayExist.update({
+        name,
+      });
+    },
 
     async deletePaymentGateway() {},
   }
