@@ -15,7 +15,9 @@ interface PaymentGatewayAttributes {
   updatedAt: Date;
 }
 
-class PaymentGateway extends Model<PaymentGatewayAttributes> {
+type CreatePaymentGateyAttributes = Omit<PaymentGatewayAttributes, 'id' | 'createdAt' | 'updatedAt'>
+
+class PaymentGateway extends Model<PaymentGatewayAttributes | CreatePaymentGateyAttributes> {
   declare id: string;
 
   declare name: string;

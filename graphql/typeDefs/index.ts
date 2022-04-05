@@ -65,6 +65,19 @@ export const typeDefs = gql`
     name: String!
   }
 
+  input PaymentGatewayInput {
+    name: String!
+  }
+
+  input PaymentGatewayInputUpdate {
+    id: ID!
+    name: String!
+  }
+
+  input DeletePaymentGatewayInput {
+    id: ID!
+  }
+
   type Query {
     plans: [Plan]
     customers: [Customer]
@@ -80,5 +93,9 @@ export const typeDefs = gql`
     createCustomer(input: CustomerInput!): Customer
     updateCustomer(input: CustomerInputUpdate!): Customer
     deleteCustomer(input: DeleteCustomerInput): Boolean
+
+    createPaymentGateway(input: PaymentGatewayInput!): PaymentGateway
+    updatePaymentGateway(input: PaymentGatewayInputUpdate!): PaymentGateway
+    deletePaymentGateway(input: DeletePaymentGatewayInput): Boolean
   }
 `;

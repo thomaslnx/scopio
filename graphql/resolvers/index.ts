@@ -46,6 +46,11 @@ interface DeleteCustomerInput {
     id: string;
   }
 }
+interface CreatePaymentGatewayInput {
+  input: {
+    name: string;
+  }
+}
 
 export const resolvers = {
   Query: {
@@ -180,6 +185,28 @@ export const resolvers = {
           id: id
         }
       })
-    }
+    },
+
+    async createPaymentGateway(_:any, { input }: CreatePaymentGatewayInput) {
+      const { name } = input;
+
+      const paymentGatewayExist = await PaymentGateway.findOne({
+        where: {
+          name: name,
+        }
+      });
+
+      if(paymentGatewayExist) {
+        throw new Error('This payment gateway already exist!');
+      }
+
+      return PaymentGateway.create({
+        name: name,
+      })
+    },
+
+    async updatePaymentGateway() {},
+
+    async deletePaymentGateway() {},
   }
 };
