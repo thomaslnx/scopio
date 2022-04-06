@@ -71,21 +71,21 @@ Subscription.init(
       type: DataTypes.UUID,
       references: {
         model: Customer,
-        key: 'Id',
+        key: 'id',
       },
     },
     planId: {
       type: DataTypes.UUID,
       references: {
         model: Plan,
-        key: 'Id'
+        key: 'id'
       },
     },
     paymentGatewayId: {
       type: DataTypes.UUID,
       references: {
         model: PaymentGateway,
-        key: 'Id',
+        key: 'id',
       },
     },
   },

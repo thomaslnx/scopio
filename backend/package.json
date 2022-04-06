@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "server": "nodemon --watch './**/*.ts' --exec 'node --trace-warnings --experimental-specifier-resolution=node --loader ts-node/esm' src/server/index.ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "backend-docker": "docker-compose up backend-scopio"
   },
   "engines": {
     "node": "17"

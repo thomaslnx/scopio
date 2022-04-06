@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend-scopio:
+    image: scopio-backend
+    depends_on:
+      - database
+    build: .
+    environment:
+      PORT: 3000
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: scopio
+      POSTGRES_PASSWORD: scopio
+      POSTGRES_DB: scopio_plans
+    command:
+      - yarn
+      - server
+      - yarn
+      - sequelize
+      - db:migrate
+    volumes:
+      - .:/scopio-backend
+      - node_modules:/scopio-backend/node_modules
+    ports:
+      - 3000:3000
+
+  database:
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: scopio
+      POSTGRES_PASSWORD: scopio
+      POSTGRES_DB: scopio_plans
+    ports:
+      - 5432:5432
+    volumes:
+      - database-volume:/var/lib/postgresql/data
+      - ./db/init.sh:/db/docker-entrypoint-initdb.d/init.sh
+
+volumes:
+  node_modules: {}
+  database-volume:

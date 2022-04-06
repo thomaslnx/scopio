@@ -2,7 +2,7 @@ const config = {
   username: 'scopio',
   password: 'scopio',
   database: 'scopio_plans',
-  host: '127.0.0.1',
+  host: 'database',
   dialect: 'postgres',
 };
 
