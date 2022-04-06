@@ -61,3 +61,11 @@ Obs: case show up a message telling you that .git file was not found just run th
 🎉 🎉 🎉 Well, at this point your project is set up and running. So, you can access the server and can make the backend operations, go to your browser and type: http://localhost:3000/graphql.
 
 The Docker and Docker Compose can be possible to contain all the backend application, including the database and some initial data.
+
+
+If you like from my job you can find me:
+<br/>
+<br/>
+![GitHub](https://img.shields.io/github/followers/thomaslnx?style=social)
+
+![Twitter](https://img.shields.io/twitter/follow/thomaslnx?style=social)
