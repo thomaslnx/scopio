@@ -53,3 +53,11 @@ Then make the clone by following the link:
 After you have cloned the repo install all the project's dependencies by running the command:
 
 ```yarn``` or ```npm install```
+
+Obs: case show up a message telling you that .git file was not found just run the command: ```git init````
+
+<br/>
+
+🎉 🎉 🎉 Well, at this point your project is set up and running. So, you can access the server and can make the backend operations, go to your browser and type: http://localhost:3000/graphql.
+
+The Docker and Docker Compose can be possible to contain all the backend application, including the database and some initial data.
