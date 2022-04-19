@@ -121,7 +121,7 @@ const CustomerPopper = (props: PopperProps) => {
 
 const CustomerForm: React.FC = () => {
   const { PLANS_QUERY, PAYMENT_GATEWAYS_QUERY, CUSTOMERS_QUERY } = queries;
-  const { CREATE_CUSTOMER, UPDATE_CUSTOMER } = mutations;
+  const { CREATE_CUSTOMER, UPDATE_CUSTOMER, DELETE_CUSTOMER } = mutations;
 
   const { data: dataFromCustomers, error: errorCustomers } = useQuery<CustomersQuery>(CUSTOMERS_QUERY);
   const { data: dataFromPaymentGateway, loading: loadingPaymentGateway, error: errorPaymentGateway } = useQuery<PaymentGatewayAttributes>(PAYMENT_GATEWAYS_QUERY);
@@ -220,6 +220,11 @@ const CustomerForm: React.FC = () => {
     }
   })
 
+  const [ deleteCustomer ] = useMutation<
+                      { deleteCustomer: string },
+                      { input: { id: string }}
+  >(DELETE_CUSTOMER);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
 
@@ -267,6 +272,15 @@ const CustomerForm: React.FC = () => {
     }
   };
 
+  const handleDeleteCustomer = () => {
+    console.log('botão de deletar customer pressionado!');
+    if (foundedUser !== undefined) {
+      deleteCustomer({
+        variables: { input: { id: foundedUser?.id }}
+      });
+    }
+  }
+
   const handleAutoCompleteChange = (e: SyntheticEvent, value: FoundedUserData | string) => {
     let userId: string = '';
     
@@ -293,7 +307,6 @@ const CustomerForm: React.FC = () => {
     if (typeof value === 'string') {
       console.log('entrou dentro do if de string');
     };
-    
     return;
   }
 
@@ -531,6 +544,8 @@ const CustomerForm: React.FC = () => {
                   </Button>
 
                   <Button
+                    type="button"
+                    onClick={handleDeleteCustomer}
                     variant="text"
                     sx={{
                       color: 'red',

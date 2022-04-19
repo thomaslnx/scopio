@@ -24,6 +24,16 @@ const UPDATE_CUSTOMER = gql`
   }
 `;
 
-const mutations = { CREATE_CUSTOMER, UPDATE_CUSTOMER }
+const DELETE_CUSTOMER = gql`
+  mutation deleteCustomer($input: DeleteCustomerInput) {
+    deleteCustomer(input: $input)
+  }
+`;
+
+const mutations = { 
+  CREATE_CUSTOMER,
+  UPDATE_CUSTOMER ,
+  DELETE_CUSTOMER,
+}
 
 export default mutations;
