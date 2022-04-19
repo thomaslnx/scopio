@@ -273,8 +273,7 @@ const CustomerForm: React.FC = () => {
   };
 
   const handleDeleteCustomer = () => {
-    console.log('botão de deletar customer pressionado!');
-    if (foundedUser !== undefined) {
+      if (foundedUser !== undefined) {
       deleteCustomer({
         variables: { input: { id: foundedUser?.id }}
       });
