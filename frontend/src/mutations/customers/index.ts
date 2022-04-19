@@ -10,8 +10,20 @@ const CREATE_CUSTOMER = gql`
       email
     }
   }
+  `;
+  
+const UPDATE_CUSTOMER = gql`
+  mutation updateCustomer($input: CustomerInputUpdate!) {
+    updateCustomer(input: $input) {
+      id
+      firstName
+      lastName
+      role
+      email
+    }
+  }
 `;
 
-const mutations = { CREATE_CUSTOMER }
+const mutations = { CREATE_CUSTOMER, UPDATE_CUSTOMER }
 
 export default mutations;

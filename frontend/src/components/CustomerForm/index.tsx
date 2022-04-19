@@ -1,4 +1,4 @@
-import React, { ChangeEvent, SyntheticEvent, useState } from 'react';
+import React, { ChangeEvent, SyntheticEvent, useState, useEffect } from 'react';
 import {
   Box, 
   Grid, 
@@ -12,11 +12,16 @@ import {
   InputLabel,
   SelectChangeEvent,
   Snackbar,
+  Autocomplete,
+  Popper,
+  PopperProps,
+  Theme,
 } from '@mui/material';
+import { makeStyles, createStyles } from '@mui/styles';
 import MuiAlert, { AlertProps } from '@mui/material/Alert'
 import { BsSearch } from 'react-icons/bs';
 
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 
 import queries from '../../queries/customers';
 import mutations from '../../mutations/customers';
@@ -28,17 +33,45 @@ interface PlansAttributes {
     price: number
   }>
 }
-
 interface CustomersAttributes {
-    id: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    email: string;
+   customers: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      email: string;
+      __typename: string;
+  }
 }
 
-type CustomersInputAttributes = Omit<CustomersAttributes, 'id'>;
+interface CustomersQuery {
+  customers: Array<
+    {
+      id: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      email: string;
+    }
+  >
+}
+interface FoundedUserData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  email: string;
+};
 
+interface UpdateCustomerInput {
+  id?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  email?: string;
+}
+
+type CustomersInputAttributes = Omit<CustomersAttributes['customers'], 'id' | '__typename'>;
 interface PaymentGatewayAttributes {
   paymentGateway: Array<{
     id: string;
@@ -64,10 +97,33 @@ const fields = {
   paymentGateway: '',
 } ;
 
-const CustomerForm: React.FC = () => {
-  const { PLANS_QUERY, PAYMENT_GATEWAYS_QUERY } = queries;
-  const { CREATE_CUSTOMER } = mutations;
+const useStyles = makeStyles((theme?: Theme) =>
+  createStyles({
+    root: {
+      zIndex: 5000,
+      '& .MuiAutocomplete-listbox': {
+        '& li': {
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          width: '100%',
+          paddingRight: '80px',
+          paddingLeft: '40px',
+        }
+      }
+    }
+  })
+)
 
+const CustomerPopper = (props: PopperProps) => {
+  const classes = useStyles();
+  return <Popper {...props} className={classes.root} placement="bottom" />
+}
+
+const CustomerForm: React.FC = () => {
+  const { PLANS_QUERY, PAYMENT_GATEWAYS_QUERY, CUSTOMERS_QUERY } = queries;
+  const { CREATE_CUSTOMER, UPDATE_CUSTOMER } = mutations;
+
+  const { data: dataFromCustomers, error: errorCustomers } = useQuery<CustomersQuery>(CUSTOMERS_QUERY);
   const { data: dataFromPaymentGateway, loading: loadingPaymentGateway, error: errorPaymentGateway } = useQuery<PaymentGatewayAttributes>(PAYMENT_GATEWAYS_QUERY);
   const { data: dataFromPlans, loading: loadingPlans, error: errorPlans } = useQuery<PlansAttributes>(PLANS_QUERY);
   
@@ -75,8 +131,22 @@ const CustomerForm: React.FC = () => {
   const paymentGateways = dataFromPaymentGateway?.paymentGateway;
 
   const [formsData, setFormsData] = useState<DefaultInputData>(fields);
+  
   const [successSnackBarOpen, setSuccessSnackBarOpen] = useState<boolean>(false);
   const [errorSnackBarOpen, setErrorSnackBarOpen] = useState<boolean>(false);
+  
+  const [updateSuccessSnackBarOpen, setUpdateSuccessSnackBarOpen] = useState<boolean>(false);
+  const [updateErrorSnackBarOpen, setUpdateErrorSnackBarOpen] = useState<boolean>(false);
+
+  const [customersList, setCustomersList] = useState<CustomersQuery['customers'] | undefined>();
+  const [foundedUser, setFoundedUser] = useState<FoundedUserData>();
+
+  useEffect(() => {
+    if (dataFromCustomers !== undefined) {
+      const listOfCustomers = dataFromCustomers.customers;
+      setCustomersList(listOfCustomers);
+    }
+  }, [dataFromCustomers]);
   
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props, ref
@@ -97,20 +167,74 @@ const CustomerForm: React.FC = () => {
     },
     variables: {
     input: {
-      firstName: formsData.firstName,
-      lastName: formsData.lastName,
-      role: formsData.role,
-      email: formsData.email
+        firstName: formsData.firstName,
+        lastName: formsData.lastName,
+        role: formsData.role,
+        email: formsData.email
     }
   }});
+
+  const [updateCustomer] = useMutation<
+                  { updateCustomer: UpdateCustomerInput },
+                  { input: UpdateCustomerInput }
+  >(UPDATE_CUSTOMER, {
+    update(cache, { data: updateCustomer }) {
+      cache.modify({
+        fields: {
+          updateCustomer(customer: UpdateCustomerInput[]) {
+            const updatedCustomer = cache.writeFragment({
+              data: updateCustomer,
+              fragment: gql`
+                updateCustomer on Customer {
+                  id
+                  firstName
+                  lastName
+                  role
+                  email
+                }
+              `
+            });
+
+            return [...customer, updatedCustomer]
+          }
+        }
+      })
+    },
+    onCompleted: () => {
+      console.log('update realizado com sucesso');
+      setFormsData(fields);
+      setUpdateSuccessSnackBarOpen(true);
+      setFoundedUser(undefined);
+    },
+    onError: () => {
+      setUpdateErrorSnackBarOpen(true);
+    },
+    variables: {
+      input: {
+        id: foundedUser?.id,
+        firstName: foundedUser?.firstName,
+        lastName: foundedUser?.lastName,
+        role: foundedUser?.role,
+        email: foundedUser?.email,
+      }
+    }
+  })
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
 
-    setFormsData({
-      ...formsData,
-      [name]: value
-    })
+    if (foundedUser !== undefined) {
+      setFoundedUser({
+        ...foundedUser,
+        [name]: value
+      })
+    } else {
+      setFormsData({
+        ...formsData,
+        [name]: value
+      })
+    }
+
   };
 
   const snackBarHandClose = (e: SyntheticEvent | Event, reason?: string) => {
@@ -120,15 +244,61 @@ const CustomerForm: React.FC = () => {
 
     setSuccessSnackBarOpen(false);
     setErrorSnackBarOpen(false);
-  }
+    setUpdateSuccessSnackBarOpen(false);
+  };
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     createCustomer && createCustomer();
   };
 
+  const handleUpdateCustomer = (e: SyntheticEvent | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.preventDefault();
+    if (foundedUser !== undefined) {
+      updateCustomer && updateCustomer({ variables: { 
+        input: {
+          id: foundedUser?.id,
+          firstName: foundedUser?.firstName,
+          lastName: foundedUser?.lastName,
+          role: foundedUser?.role,
+          email: foundedUser?.email,
+        }
+        }} );
+    }
+  };
 
-  if (dataFromPlans && dataFromPaymentGateway) {
+  const handleAutoCompleteChange = (e: SyntheticEvent, value: FoundedUserData | string) => {
+    let userId: string = '';
+    
+    if (typeof value === 'object') {
+      Object.entries(value).forEach(([key, value]) => {
+        if (key === 'id') {
+          userId = value;
+
+          customersList?.map(customer => {
+            if(customer.id === userId) {
+              setFoundedUser({
+                id: customer.id,
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                role: customer.role,
+                email: customer.email,
+              });
+            }
+            return;
+          })
+        }
+      });
+    };
+    if (typeof value === 'string') {
+      console.log('entrou dentro do if de string');
+    };
+    
+    return;
+  }
+
+
+  if (dataFromPlans && dataFromPaymentGateway && customersList) {
 
     return (
       <Box
@@ -168,8 +338,15 @@ const CustomerForm: React.FC = () => {
               An error happened!
             </Alert>
           </Snackbar>
+
+          <Snackbar open={updateSuccessSnackBarOpen} autoHideDuration={5000} onClose={snackBarHandClose}>
+            <Alert onClose={snackBarHandClose} severity='success' sx={{ width: '100%' }}>
+              User updated successfully!
+            </Alert>
+          </Snackbar>
+
          
-          <form onSubmit={handleSubmit} style={{ width: 1000, height: 600, marginTop: '20px' }}
+          <form onSubmit={foundedUser !== undefined ? handleUpdateCustomer : handleSubmit} style={{ width: 1000, height: 600, marginTop: '20px' }}
           >
             <Box sx={{ flexGrow: 1 }}>
               <Grid 
@@ -180,20 +357,40 @@ const CustomerForm: React.FC = () => {
                 }}
               >
                 <Grid item sm={8} sx={{ height: '20px' }}>
-                  <TextField 
+                  <Autocomplete
                     id="search-input"
-                    name="search"
-                    label="Search name or email"
-                    type="text"
-                    fullWidth
+                    freeSolo
+                    disableClearable
                     size="small"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <BsSearch />
-                        </InputAdornment>
-                      )
-                    }}
+                    openOnFocus={false}
+                    options={customersList}
+                    renderInput={(params) => 
+                      <TextField 
+                        name="search"
+                        {...params} 
+                        label="Search name or email"
+                        InputProps={{
+                          ...params.InputProps,
+                          type: 'search',
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <BsSearch />
+                            </InputAdornment>
+                          )
+                        }}
+                        />
+                      }
+                    getOptionLabel={(option) => `${option.firstName}`}
+                    renderOption={(props, option) => (
+                      <>
+                        <li key={option.id} {...props}>
+                          <p>{option.firstName}</p>
+                          <p>{option.email}</p>
+                        </li>
+                      </>
+                      )}
+                    PopperComponent={CustomerPopper}
+                    onChange={handleAutoCompleteChange}
                   />
                 </Grid>
                 <Box 
@@ -211,7 +408,7 @@ const CustomerForm: React.FC = () => {
                       type="text"
                       size="small"
                       style={{ width: '98%' }}
-                      value={formsData.firstName}
+                      value={foundedUser !== undefined ? foundedUser.firstName : formsData.firstName}
                       onChange={handleInputChange}
                     />
                   </Grid>
@@ -224,7 +421,7 @@ const CustomerForm: React.FC = () => {
                       fullWidth
                       size="small"
                       sx={{ width: '98%' }}
-                      value={formsData.lastName}
+                      value={foundedUser !== undefined ? foundedUser.lastName : formsData.lastName}
                       onChange={handleInputChange}
                     />
                   </Grid>
@@ -238,7 +435,7 @@ const CustomerForm: React.FC = () => {
                     type="text"
                     fullWidth
                     size="small"
-                    value={formsData.role}
+                    value={foundedUser !== undefined ? foundedUser.role : formsData.role}
                     onChange={handleInputChange}
                   />
                 </Grid>
@@ -250,7 +447,7 @@ const CustomerForm: React.FC = () => {
                     type="text"
                     fullWidth
                     size="small"
-                    value={formsData.email}
+                    value={foundedUser !== undefined ? foundedUser.email : formsData.email}
                     onChange={handleInputChange}
                   />
                 </Grid>
@@ -305,19 +502,71 @@ const CustomerForm: React.FC = () => {
               </Grid>
             </Box>
   
-            <Button 
-              variant="contained"
-              sx={{
-                backgroundColor: '#631bc7',
-                borderRadius: '30px',
-                height: '50px',
-                width: '200px',
-                marginTop: '30px'
-              }}
-              type="submit"
-            >
-              Add Customer
-            </Button>
+            {
+              foundedUser !== undefined ?
+              (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '41.62rem',
+                    height: '50px',
+                    marginTop: '30px',
+                    paddingRight: '12rem',
+                  }}
+                >
+                  <Button 
+                    variant="contained"
+                    sx={{
+                      backgroundColor: '#631bc7',
+                      borderRadius: '30px',
+                      height: '50px',
+                      width: '200px',
+                      textTransform: 'none',
+                    }}
+                    type="submit"
+                  >
+                    Save Details
+                  </Button>
+
+                  <Button
+                    variant="text"
+                    sx={{
+                      color: 'red',
+                      height: '40px',
+                      textTransform: 'none',
+                      paddingTop: '15px',
+                      marginTop: '-10px',
+                      
+                      '& span': {
+                          borderBottom: '2px solid red',
+                          borderRadius: '0px',
+                          marginLeft: '7px',
+                          width: '87%',
+                      }
+                    }}
+                  >
+                    Delete Customer
+                  </Button>
+                </Box>
+              ) : 
+              (
+                <Button 
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#631bc7',
+                    borderRadius: '30px',
+                    height: '50px',
+                    width: '200px',
+                    marginTop: '30px'
+                  }}
+                  type="submit"
+                >
+                  Add Customer
+              </Button>
+            )
+            }
           </form>
         </Box>
       </Box>
@@ -331,11 +580,8 @@ const CustomerForm: React.FC = () => {
   if (errorPaymentGateway) {
     return <p>Erro na busca dos meios de pagamento!</p>;
   }
-
-  // if (loadingPlans || loadingPaymentGateway) {
-    return <p>loading...</p>;
-  // }
-   
+  
+  return <p>loading...</p>;
 }
 
 export default CustomerForm;
